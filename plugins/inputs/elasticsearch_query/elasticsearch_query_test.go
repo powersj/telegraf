@@ -526,7 +526,7 @@ func setupIntegrationTest() error {
 		return err
 	}
 
-	bulkRequest := e.esClient.Bulk()
+	bulkRequest := e.esClient.Bulk().Refresh("wait_for")
 
 	// populate elasticsearch with nginx_logs test data file
 	file, err := os.Open("testdata/nginx_logs")
@@ -564,13 +564,6 @@ func setupIntegrationTest() error {
 	}
 
 	_, err = bulkRequest.Do(context.Background())
-	if err != nil {
-		return err
-	}
-
-	// force elastic to refresh indexes to get new batch data
-	ctx := context.Background()
-	_, err = e.esClient.Refresh().Do(ctx)
 	if err != nil {
 		return err
 	}
