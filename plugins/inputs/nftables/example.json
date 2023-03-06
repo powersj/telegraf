@@ -1,0 +1,32 @@
+{
+  "nftables": [
+    {
+      "rule": {
+        "family": "inet",
+        "table": "filter",
+        "chain": "output",
+        "handle": 3,
+        "expr": [
+          {
+            "match": {
+              "op": "==",
+              "left": {
+                "payload": {
+                  "protocol": "ip",
+                  "field": "daddr"
+                }
+              },
+              "right": "8.8.8.8"
+            }
+          },
+          {
+            "counter": {
+              "packets": 5,
+              "bytes": 420
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
