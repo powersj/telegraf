@@ -1,0 +1,2772 @@
+{
+    "nftables": [
+      {
+        "metainfo": {
+          "version": "1.0.6",
+          "release_name": "Lester Gooch #5",
+          "json_schema_version": 1
+        }
+      },
+      {
+        "table": {
+          "family": "ip",
+          "name": "filter",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "LIBVIRT_INP",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "INPUT",
+          "handle": 2,
+          "type": "filter",
+          "hook": "input",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "LIBVIRT_OUT",
+          "handle": 4
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "OUTPUT",
+          "handle": 5,
+          "type": "filter",
+          "hook": "output",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "LIBVIRT_FWO",
+          "handle": 7
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "FORWARD",
+          "handle": 8,
+          "type": "filter",
+          "hook": "forward",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "LIBVIRT_FWI",
+          "handle": 10
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "LIBVIRT_FWX",
+          "handle": 12
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "DOCKER",
+          "handle": 27
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "DOCKER-ISOLATION-STAGE-1",
+          "handle": 28
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "DOCKER-ISOLATION-STAGE-2",
+          "handle": 29
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "filter",
+          "name": "DOCKER-USER",
+          "handle": 53
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_INP",
+          "handle": 61,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "counter": {
+                "packets": 306,
+                "bytes": 20245
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_INP",
+          "handle": 60,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "tcp",
+                    "field": "dport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_INP",
+          "handle": 57,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 67
+              }
+            },
+            {
+              "counter": {
+                "packets": 6,
+                "bytes": 1976
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_INP",
+          "handle": 56,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "tcp",
+                    "field": "dport"
+                  }
+                },
+                "right": 67
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "INPUT",
+          "handle": 3,
+          "expr": [
+            {
+              "counter": {
+                "packets": 1830720,
+                "bytes": 6785226167
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_INP"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_OUT",
+          "handle": 63,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_OUT",
+          "handle": 62,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "tcp",
+                    "field": "dport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_OUT",
+          "handle": 59,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 68
+              }
+            },
+            {
+              "counter": {
+                "packets": 6,
+                "bytes": 1978
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_OUT",
+          "handle": 58,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "tcp",
+                    "field": "dport"
+                  }
+                },
+                "right": 68
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "OUTPUT",
+          "handle": 6,
+          "expr": [
+            {
+              "counter": {
+                "packets": 1213064,
+                "bytes": 394047563
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_OUT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_FWO",
+          "handle": 67,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 14850,
+                "bytes": 1951088
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_FWO",
+          "handle": 64,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "REJECT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 55,
+          "expr": [
+            {
+              "counter": {
+                "packets": 37742,
+                "bytes": 90551494
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER-USER"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 50,
+          "expr": [
+            {
+              "counter": {
+                "packets": 37742,
+                "bytes": 90551494
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER-ISOLATION-STAGE-1"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 49,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "xt": {
+                "type": "match",
+                "name": "conntrack"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 48,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 47,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 46,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 42,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "xt": {
+                "type": "match",
+                "name": "conntrack"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 41,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 40,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 39,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 13,
+          "expr": [
+            {
+              "counter": {
+                "packets": 37746,
+                "bytes": 90552526
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_FWX"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 11,
+          "expr": [
+            {
+              "counter": {
+                "packets": 37746,
+                "bytes": 90552526
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_FWI"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 9,
+          "expr": [
+            {
+              "counter": {
+                "packets": 14958,
+                "bytes": 1992149
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_FWO"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_FWI",
+          "handle": 68,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "xt": {
+                "type": "match",
+                "name": "conntrack"
+              }
+            },
+            {
+              "counter": {
+                "packets": 22788,
+                "bytes": 88560377
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_FWI",
+          "handle": 65,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "REJECT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "LIBVIRT_FWX",
+          "handle": 66,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-ISOLATION-STAGE-1",
+          "handle": 51,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER-ISOLATION-STAGE-2"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-ISOLATION-STAGE-1",
+          "handle": 44,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER-ISOLATION-STAGE-2"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-ISOLATION-STAGE-1",
+          "handle": 30,
+          "expr": [
+            {
+              "counter": {
+                "packets": 37742,
+                "bytes": 90551494
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-ISOLATION-STAGE-2",
+          "handle": 52,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "drop": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-ISOLATION-STAGE-2",
+          "handle": 45,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "drop": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-ISOLATION-STAGE-2",
+          "handle": 31,
+          "expr": [
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "filter",
+          "chain": "DOCKER-USER",
+          "handle": 54,
+          "expr": [
+            {
+              "counter": {
+                "packets": 37742,
+                "bytes": 90551494
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "table": {
+          "family": "ip",
+          "name": "nat",
+          "handle": 2
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "nat",
+          "name": "LIBVIRT_PRT",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "nat",
+          "name": "POSTROUTING",
+          "handle": 2,
+          "type": "nat",
+          "hook": "postrouting",
+          "prio": 100,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "nat",
+          "name": "DOCKER",
+          "handle": 9
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "nat",
+          "name": "PREROUTING",
+          "handle": 12,
+          "type": "nat",
+          "hook": "prerouting",
+          "prio": -100,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "nat",
+          "name": "OUTPUT",
+          "handle": 14,
+          "type": "nat",
+          "hook": "output",
+          "prio": -100,
+          "policy": "accept"
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "LIBVIRT_PRT",
+          "handle": 24,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "224.0.0.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 6,
+                "bytes": 595
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "LIBVIRT_PRT",
+          "handle": 23,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": "255.255.255.255"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "LIBVIRT_PRT",
+          "handle": 22,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "l4proto"
+                  }
+                },
+                "right": "tcp"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 343,
+                "bytes": 17916
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "MASQUERADE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "LIBVIRT_PRT",
+          "handle": 21,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "l4proto"
+                  }
+                },
+                "right": "udp"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 63,
+                "bytes": 14692
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "MASQUERADE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "LIBVIRT_PRT",
+          "handle": 20,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.122.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "MASQUERADE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "POSTROUTING",
+          "handle": 18,
+          "expr": [
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "172.17.0.0",
+                    "len": 16
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "MASQUERADE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "POSTROUTING",
+          "handle": 16,
+          "expr": [
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "172.18.0.0",
+                    "len": 16
+                  }
+                }
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "MASQUERADE"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "POSTROUTING",
+          "handle": 3,
+          "expr": [
+            {
+              "counter": {
+                "packets": 13179,
+                "bytes": 2416735
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_PRT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "DOCKER",
+          "handle": 19,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "docker0"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "DOCKER",
+          "handle": 17,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "br-eaa8782990a1"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "return": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "PREROUTING",
+          "handle": 13,
+          "expr": [
+            {
+              "xt": {
+                "type": "match",
+                "name": "addrtype"
+              }
+            },
+            {
+              "counter": {
+                "packets": 3443,
+                "bytes": 218638
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "nat",
+          "chain": "OUTPUT",
+          "handle": 15,
+          "expr": [
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "127.0.0.0",
+                    "len": 8
+                  }
+                }
+              }
+            },
+            {
+              "xt": {
+                "type": "match",
+                "name": "addrtype"
+              }
+            },
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "DOCKER"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "table": {
+          "family": "ip",
+          "name": "mangle",
+          "handle": 3
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "mangle",
+          "name": "LIBVIRT_PRT",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip",
+          "table": "mangle",
+          "name": "POSTROUTING",
+          "handle": 2,
+          "type": "filter",
+          "hook": "postrouting",
+          "prio": -150,
+          "policy": "accept"
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "mangle",
+          "chain": "LIBVIRT_PRT",
+          "handle": 5,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "virbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 68
+              }
+            },
+            {
+              "counter": {
+                "packets": 6,
+                "bytes": 1978
+              }
+            },
+            {
+              "xt": {
+                "type": "target",
+                "name": "CHECKSUM"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip",
+          "table": "mangle",
+          "chain": "POSTROUTING",
+          "handle": 3,
+          "expr": [
+            {
+              "counter": {
+                "packets": 1250898,
+                "bytes": 484610438
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_PRT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "table": {
+          "family": "ip6",
+          "name": "filter",
+          "handle": 4
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "LIBVIRT_INP",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "INPUT",
+          "handle": 2,
+          "type": "filter",
+          "hook": "input",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "LIBVIRT_OUT",
+          "handle": 4
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "OUTPUT",
+          "handle": 5,
+          "type": "filter",
+          "hook": "output",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "LIBVIRT_FWO",
+          "handle": 7
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "FORWARD",
+          "handle": 8,
+          "type": "filter",
+          "hook": "forward",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "LIBVIRT_FWI",
+          "handle": 10
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "filter",
+          "name": "LIBVIRT_FWX",
+          "handle": 12
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "filter",
+          "chain": "INPUT",
+          "handle": 3,
+          "expr": [
+            {
+              "counter": {
+                "packets": 41,
+                "bytes": 2811
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_INP"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "filter",
+          "chain": "OUTPUT",
+          "handle": 6,
+          "expr": [
+            {
+              "counter": {
+                "packets": 65,
+                "bytes": 4991
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_OUT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 13,
+          "expr": [
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_FWX"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 11,
+          "expr": [
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_FWI"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "filter",
+          "chain": "FORWARD",
+          "handle": 9,
+          "expr": [
+            {
+              "counter": {
+                "packets": 0,
+                "bytes": 0
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_FWO"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "table": {
+          "family": "ip6",
+          "name": "nat",
+          "handle": 5
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "nat",
+          "name": "LIBVIRT_PRT",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "nat",
+          "name": "POSTROUTING",
+          "handle": 2,
+          "type": "nat",
+          "hook": "postrouting",
+          "prio": 100,
+          "policy": "accept"
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "nat",
+          "chain": "POSTROUTING",
+          "handle": 3,
+          "expr": [
+            {
+              "counter": {
+                "packets": 4,
+                "bytes": 336
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_PRT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "table": {
+          "family": "ip6",
+          "name": "mangle",
+          "handle": 6
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "mangle",
+          "name": "LIBVIRT_PRT",
+          "handle": 1
+        }
+      },
+      {
+        "chain": {
+          "family": "ip6",
+          "table": "mangle",
+          "name": "POSTROUTING",
+          "handle": 2,
+          "type": "filter",
+          "hook": "postrouting",
+          "prio": -150,
+          "policy": "accept"
+        }
+      },
+      {
+        "rule": {
+          "family": "ip6",
+          "table": "mangle",
+          "chain": "POSTROUTING",
+          "handle": 3,
+          "expr": [
+            {
+              "counter": {
+                "packets": 84,
+                "bytes": 6390
+              }
+            },
+            {
+              "jump": {
+                "target": "LIBVIRT_PRT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "table": {
+          "family": "inet",
+          "name": "lxd",
+          "handle": 10
+        }
+      },
+      {
+        "chain": {
+          "family": "inet",
+          "table": "lxd",
+          "name": "pstrt.lxdbr0",
+          "handle": 1,
+          "type": "nat",
+          "hook": "postrouting",
+          "prio": 100,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "inet",
+          "table": "lxd",
+          "name": "fwd.lxdbr0",
+          "handle": 3,
+          "type": "filter",
+          "hook": "forward",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "inet",
+          "table": "lxd",
+          "name": "in.lxdbr0",
+          "handle": 6,
+          "type": "filter",
+          "hook": "input",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "chain": {
+          "family": "inet",
+          "table": "lxd",
+          "name": "out.lxdbr0",
+          "handle": 7,
+          "type": "filter",
+          "hook": "output",
+          "prio": 0,
+          "policy": "accept"
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "pstrt.lxdbr0",
+          "handle": 2,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "saddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.100.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "match": {
+                "op": "!=",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "daddr"
+                  }
+                },
+                "right": {
+                  "prefix": {
+                    "addr": "192.168.100.0",
+                    "len": 24
+                  }
+                }
+              }
+            },
+            {
+              "masquerade": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "fwd.lxdbr0",
+          "handle": 4,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "version"
+                  }
+                },
+                "right": 4
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "fwd.lxdbr0",
+          "handle": 5,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "ip",
+                    "field": "version"
+                  }
+                },
+                "right": 4
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "in.lxdbr0",
+          "handle": 10,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "tcp",
+                    "field": "dport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "in.lxdbr0",
+          "handle": 11,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "in.lxdbr0",
+          "handle": 12,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "icmp",
+                    "field": "type"
+                  }
+                },
+                "right": {
+                  "set": [
+                    "destination-unreachable",
+                    "time-exceeded",
+                    "parameter-problem"
+                  ]
+                }
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "in.lxdbr0",
+          "handle": 13,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "iifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "dport"
+                  }
+                },
+                "right": 67
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "out.lxdbr0",
+          "handle": 14,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "tcp",
+                    "field": "sport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "out.lxdbr0",
+          "handle": 15,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "sport"
+                  }
+                },
+                "right": 53
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "out.lxdbr0",
+          "handle": 16,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "icmp",
+                    "field": "type"
+                  }
+                },
+                "right": {
+                  "set": [
+                    "destination-unreachable",
+                    "time-exceeded",
+                    "parameter-problem"
+                  ]
+                }
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      },
+      {
+        "rule": {
+          "family": "inet",
+          "table": "lxd",
+          "chain": "out.lxdbr0",
+          "handle": 17,
+          "expr": [
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "meta": {
+                    "key": "oifname"
+                  }
+                },
+                "right": "lxdbr0"
+              }
+            },
+            {
+              "match": {
+                "op": "==",
+                "left": {
+                  "payload": {
+                    "protocol": "udp",
+                    "field": "sport"
+                  }
+                },
+                "right": 67
+              }
+            },
+            {
+              "accept": null
+            }
+          ]
+        }
+      }
+    ]
+  }

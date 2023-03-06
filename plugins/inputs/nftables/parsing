@@ -1,0 +1,131 @@
+iifname "virbr0" udp dport 53 counter packets 306 bytes 20245 accept
+iifname "virbr0" tcp dport 53 counter packets 0 bytes 0 accept
+iifname "virbr0" udp dport 67 counter packets 6 bytes 1976 accept
+iifname "virbr0" tcp dport 67 counter packets 0 bytes 0 accept
+	input_interface: virbr0
+	proto: udp
+	port: 54
+	action: accept
+
+
+
+oifname "virbr0" udp dport 53 counter packets 0 bytes 0 accept
+oifname "virbr0" tcp dport 53 counter packets 0 bytes 0 accept
+oifname "virbr0" udp dport 68 counter packets 6 bytes 1978 accept
+oifname "virbr0" tcp dport 68 counter packets 0 bytes 0 accept
+	output_interface: virbr0
+	proto: udp/tcp
+	port 53
+	action: accept
+
+
+
+counter packets 37742 bytes 90551494 return
+counter packets 0 bytes 0 return
+counter packets 37742 bytes 90551494 return
+	action: return
+	
+	
+
+counter packets 1897727 bytes 6876460879 jump LIBVIRT_INP
+counter packets 1247548 bytes 401055485 jump LIBVIRT_OUT
+counter packets 37742 bytes 90551494 jump DOCKER-USER
+counter packets 37742 bytes 90551494 jump DOCKER-ISOLATION-STAGE-1
+counter packets 37746 bytes 90552526 jump LIBVIRT_FWX
+counter packets 37746 bytes 90552526 jump LIBVIRT_FWI
+counter packets 14958 bytes 1992149 jump LIBVIRT_FWO
+counter packets 14448 bytes 2764147 jump LIBVIRT_PRT
+counter packets 1285382 bytes 491618360 jump LIBVIRT_PRT
+counter packets 43 bytes 2915 jump LIBVIRT_INP
+counter packets 66 bytes 5039 jump LIBVIRT_OUT
+counter packets 0 bytes 0 jump LIBVIRT_FWX
+counter packets 0 bytes 0 jump LIBVIRT_FWI
+counter packets 0 bytes 0 jump LIBVIRT_FWO
+counter packets 4 bytes 336 jump LIBVIRT_PRT
+counter packets 86 bytes 6486 jump LIBVIRT_PRT
+	action: jump
+	target: LIBVIRT_OUT
+
+oifname "docker0" counter packets 0 bytes 0 jump DOCKER
+oifname "br-eaa8782990a1" counter packets 0 bytes 0 jump DOCKER
+	action: jump
+	target: docker
+	output_interface: docker0
+
+iifname "docker0" oifname != "docker0" counter packets 0 bytes 0 jump DOCKER-ISOLATION-STAGE-2
+iifname "br-eaa8782990a1" oifname != "br-eaa8782990a1" counter packets 0 bytes 0 jump DOCKER-ISOLATION-STAGE-2
+	action: jump
+	target: DOCKER-ISOLATION-STAGE-2
+	output_interfacce: !docker0
+	input_interface: docker0
+	
+xt match addrtype counter packets 3476 bytes 229379 jump DOCKER
+ip daddr != 127.0.0.0/8 xt match addrtype counter packets 0 bytes 0 jump DOCKER
+	action: jump
+	target: DOCKER
+	match: addrtype
+
+
+
+oifname "docker0" counter packets 0 bytes 0 drop
+oifname "br-eaa8782990a1" counter packets 0 bytes 0 drop
+	action: drop
+	output_interface: docker0/br-eaa8782990a1
+
+
+
+ip saddr 192.168.122.0/24 ip daddr 224.0.0.0/24 counter packets 6 bytes 595 return
+ip saddr 192.168.122.0/24 ip daddr 255.255.255.255 counter packets 0 bytes 0 return
+	source_ip: 192.168.122.0/24
+	destination_ip: 224.0.0.0/24
+	action: return
+	
+	
+
+iifname "virbr0" ip saddr 192.168.122.0/24 counter packets 14850 bytes 1951088 accept
+	input_interface: "virbr0"
+	source: 192.168.122.0/24
+	action: accept
+	
+	
+	
+iifname "virbr0" counter packets 0 bytes 0 xt target REJECT
+
+
+	
+
+oifname "docker0" xt match conntrack counter packets 0 bytes 0 accept
+	output_interface = docker0
+	
+
+
+iifname "docker0" oifname != "docker0" counter packets 0 bytes 0 accept
+iifname "docker0" oifname "docker0" counter packets 0 bytes 0 accept
+oifname "br-eaa8782990a1" xt match conntrack counter packets 0 bytes 0 accept
+
+iifname "br-eaa8782990a1" oifname != "br-eaa8782990a1" counter packets 0 bytes 0 accept
+iifname "br-eaa8782990a1" oifname "br-eaa8782990a1" counter packets 0 bytes 0 accept
+
+oifname "virbr0" ip daddr 192.168.122.0/24 xt match conntrack counter packets 22788 bytes 88560377 accept
+oifname "virbr0" counter packets 0 bytes 0 xt target REJECT
+iifname "virbr0" oifname "virbr0" counter packets 0 bytes 0 accept
+
+
+
+
+
+
+iifname "docker0" counter packets 0 bytes 0 return
+iifname "br-eaa8782990a1" counter packets 0 bytes 0 return
+
+oifname "virbr0" udp dport 68 counter packets 6 bytes 1978 xt target CHECKSUM
+
+
+
+
+
+meta l4proto tcp ip saddr 192.168.122.0/24 ip daddr != 192.168.122.0/24 counter packets 343 bytes 17916 xt target MASQUERADE
+meta l4proto udp ip saddr 192.168.122.0/24 ip daddr != 192.168.122.0/24 counter packets 63 bytes 14692 xt target MASQUERADE
+ip saddr 192.168.122.0/24 ip daddr != 192.168.122.0/24 counter packets 0 bytes 0 xt target MASQUERADE
+oifname != "docker0" ip saddr 172.17.0.0/16 counter packets 0 bytes 0 xt target MASQUERADE
+oifname != "br-eaa8782990a1" ip saddr 172.18.0.0/16 counter packets 0 bytes 0 xt target MASQUERADE

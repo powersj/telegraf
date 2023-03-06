@@ -44,7 +44,7 @@ func (*Nftables) SampleConfig() string {
 }
 
 func (n *Nftables) Gather(acc telegraf.Accumulator) error {
-	command := []string{n.NftBinary, "--json", "--numeric", "list", "ruleset"}
+	command := []string{n.NftBinary, "--json", "list", "ruleset"}
 	if n.UseSudo {
 		command = append([]string{"sudo", "--non-interactive"}, command...)
 	}

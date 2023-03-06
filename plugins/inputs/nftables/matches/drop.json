@@ -1,0 +1,24 @@
+// TAG action: drop
+// TAG match: oifname br-eaa8782990a1
+"expr": [
+    {
+      "match": {
+        "op": "==",
+        "left": {
+          "meta": {
+            "key": "oifname"
+          }
+        },
+        "right": "br-eaa8782990a1"
+      }
+    },
+    {
+      "counter": {
+        "packets": 0,
+        "bytes": 0
+      }
+    },
+    {
+      "drop": null
+    }
+]

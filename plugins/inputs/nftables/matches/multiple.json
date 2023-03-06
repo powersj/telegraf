@@ -1,0 +1,41 @@
+// TAG: action: jump
+// TAG: target: DOCKER-ISOLATION-STAGE-2
+// TAG: match: iifname "br-eaa8782990a1" oifname != "br-eaa8782990a1"
+// OR IF WE CAN BUILD LOGIC
+// TAG: match: br-eaa8782990a1
+
+"expr": [
+    {
+      "match": {
+        "op": "==",
+        "left": {
+          "meta": {
+            "key": "iifname"
+          }
+        },
+        "right": "br-eaa8782990a1"
+      }
+    },
+    {
+      "match": {
+        "op": "!=",
+        "left": {
+          "meta": {
+            "key": "oifname"
+          }
+        },
+        "right": "br-eaa8782990a1"
+      }
+    },
+    {
+      "counter": {
+        "packets": 0,
+        "bytes": 0
+      }
+    },
+    {
+      "jump": {
+        "target": "DOCKER-ISOLATION-STAGE-2"
+      }
+    }
+  ]

@@ -1,0 +1,15 @@
+// TAG action: jump
+// TAG target: LIBVIRT_FWX
+"expr": [
+    {
+      "counter": {
+        "packets": 0,
+        "bytes": 0
+      }
+    },
+    {
+      "jump": {
+        "target": "LIBVIRT_FWX"
+      }
+    }
+]
