@@ -9,6 +9,7 @@ import (
 	"github.com/influxdata/telegraf"
 	tgConfig "github.com/influxdata/telegraf/config"
 	"github.com/influxdata/telegraf/plugins/inputs"
+	"github.com/influxdata/telegraf/plugins/outputs"
 	"github.com/influxdata/telegraf/plugins/processors"
 )
 
@@ -60,6 +61,19 @@ func TestLoadingProcessorWithConfig(t *testing.T) {
 	require.EqualValues(t, "yep", proc.Loaded)
 }
 
+func TestLoadingOutputWithConfig(t *testing.T) {
+	out := &testConfigOutput{}
+	outputs.Add("test_config_load", func() telegraf.Output {
+		return out
+	})
+
+	c := "./testdata/output.conf"
+	_, err := LoadConfig(&c)
+	require.NoError(t, err)
+
+	require.EqualValues(t, "yep", out.Loaded)
+}
+
 type testDurationInput struct {
 	Duration tgConfig.Duration `toml:"duration"`
 	Size     tgConfig.Size     `toml:"size"`
@@ -90,4 +104,22 @@ func (p *testConfigProcessor) Description() string {
 }
 func (p *testConfigProcessor) Apply(metrics ...telegraf.Metric) []telegraf.Metric {
 	return metrics
+}
+
+type testConfigOutput struct {
+	Loaded string `toml:"loaded"`
+}
+
+func (p *testConfigOutput) SampleConfig() string {
+	return ""
+}
+
+func (p *testConfigOutput) Connect() error {
+	return nil
+}
+func (p *testConfigOutput) Close() error {
+	return nil
+}
+func (p *testConfigOutput) Write(metrics []telegraf.Metric) error {
+	return nil
 }
