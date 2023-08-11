@@ -37,6 +37,10 @@ to use them.
   ## The syntax and supported options depends on selected driver.
   dsn = "username:password@mysqlserver:3307/dbname?param=value"
 
+  ## Multiple data source names to connect to
+  ## Use either dsn or dsns, but not both
+  # dsns = []
+
   ## Timeout for any operation
   ## Note that the timeout for queries is per query not per gather.
   # timeout = "5s"

@@ -209,6 +209,7 @@ func (q *Query) parse(acc telegraf.Accumulator, rows *dbsql.Rows, t time.Time) (
 type SQL struct {
 	Driver                      string          `toml:"driver"`
 	Dsn                         config.Secret   `toml:"dsn"`
+	Dsns                        []config.Secret `toml:"dsns"`
 	Timeout                     config.Duration `toml:"timeout"`
 	MaxIdleTime                 config.Duration `toml:"connection_max_idle_time"`
 	MaxLifetime                 config.Duration `toml:"connection_max_life_time"`
@@ -218,9 +219,13 @@ type SQL struct {
 	Log                         telegraf.Logger `toml:"-"`
 	DisconnectedServersBehavior string          `toml:"disconnected_servers_behavior"`
 
-	driverName      string
-	db              *dbsql.DB
-	serverConnected bool
+	driverName string
+	databases  []database
+}
+
+type database struct {
+	Connection *dbsql.DB
+	Connected  bool
 }
 
 func (*SQL) SampleConfig() string {
@@ -233,8 +238,11 @@ func (s *SQL) Init() error {
 		return errors.New("missing SQL driver option")
 	}
 
-	if err := s.checkDSN(); err != nil {
-		return err
+	if !s.Dsn.Empty() {
+		s.Dsns = append(s.Dsns, s.Dsn)
+	}
+	if len(s.Dsns) == 0 {
+		return errors.New("no data source names provided")
 	}
 
 	if s.Timeout <= 0 {
@@ -366,49 +374,50 @@ func (s *SQL) Init() error {
 	return nil
 }
 
-func (s *SQL) setupConnection() error {
+func (s *SQL) setupConnection(dsn config.Secret) (*database, error) {
 	// Connect to the database server
-	dsnSecret, err := s.Dsn.Get()
+	dsnSecret, err := dsn.Get()
 	if err != nil {
-		return fmt.Errorf("getting DSN failed: %w", err)
+		return nil, fmt.Errorf("getting DSN failed: %w", err)
 	}
-	dsn := string(dsnSecret)
+	dsnStr := string(dsnSecret)
 	config.ReleaseSecret(dsnSecret)
 
 	s.Log.Debug("Connecting...")
-	s.db, err = dbsql.Open(s.driverName, dsn)
+	db, err := dbsql.Open(s.driverName, dsnStr)
 	if err != nil {
 		// should return since the error is most likely with invalid DSN string format
-		return err
+		return nil, fmt.Errorf("failed to open connection: %w", err)
 	}
 
 	// Set the connection limits
 	// s.db.SetConnMaxIdleTime(time.Duration(s.MaxIdleTime)) // Requires go >= 1.15
-	s.db.SetConnMaxLifetime(time.Duration(s.MaxLifetime))
-	s.db.SetMaxOpenConns(s.MaxOpenConnections)
-	s.db.SetMaxIdleConns(s.MaxIdleConnections)
-	return nil
+	db.SetConnMaxLifetime(time.Duration(s.MaxLifetime))
+	db.SetMaxOpenConns(s.MaxOpenConnections)
+	db.SetMaxIdleConns(s.MaxIdleConnections)
+
+	return &database{Connection: db}, nil
 }
 
-func (s *SQL) ping() error {
+func (s *SQL) ping(db *database) error {
 	// Test if the connection can be established
 	s.Log.Debug("Testing connectivity...")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.Timeout))
-	err := s.db.PingContext(ctx)
+	err := db.Connection.PingContext(ctx)
 	cancel()
 	if err != nil {
 		return fmt.Errorf("unable to connect to database: %w", err)
 	}
-	s.serverConnected = true
+	db.Connected = true
 	return nil
 }
 
-func (s *SQL) prepareStatements() {
+func (s *SQL) prepareStatements(db *database) {
 	// Prepare the statements
 	for i, q := range s.Queries {
 		s.Log.Debugf("Preparing statement %q...", q.Query)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.Timeout))
-		stmt, err := s.db.PrepareContext(ctx, q.Query)
+		stmt, err := db.Connection.PrepareContext(ctx, q.Query)
 		cancel()
 		if err != nil {
 			// Some database drivers or databases do not support prepare
@@ -424,18 +433,21 @@ func (s *SQL) prepareStatements() {
 }
 
 func (s *SQL) Start(_ telegraf.Accumulator) error {
-	if err := s.setupConnection(); err != nil {
-		return err
-	}
-
-	if err := s.ping(); err != nil {
-		if s.DisconnectedServersBehavior == "error" {
+	for _, dsn := range s.Dsns {
+		db, err := s.setupConnection(dsn)
+		if err != nil {
 			return err
 		}
-		s.Log.Errorf("unable to connect to database: %s", err)
-	}
-	if s.serverConnected {
-		s.prepareStatements()
+
+		if err := s.ping(db); err != nil {
+			if s.DisconnectedServersBehavior == "error" {
+				return err
+			}
+			s.Log.Errorf("unable to connect to database: %s", err)
+		}
+		if db.Connected {
+			s.prepareStatements(db)
+		}
 	}
 
 	return nil
@@ -452,9 +464,11 @@ func (s *SQL) Stop() {
 	}
 
 	// Close the connection to the server
-	if s.db != nil {
-		if err := s.db.Close(); err != nil {
-			s.Log.Errorf("closing database connection failed: %v", err)
+	for _, db := range s.databases {
+		if db.Connection != nil {
+			if err := db.Connection.Close(); err != nil {
+				s.Log.Errorf("closing database connection failed: %v", err)
+			}
 		}
 	}
 }
@@ -463,28 +477,30 @@ func (s *SQL) Gather(acc telegraf.Accumulator) error {
 	// during plugin startup, it is possible that the server was not reachable.
 	// we try pinging the server in this collection cycle.
 	// we are only concerned with `prepareStatements` function to complete(return true), just once.
-	if !s.serverConnected {
-		if err := s.ping(); err != nil {
-			return err
-		}
-		s.prepareStatements()
-	}
-
-	var wg sync.WaitGroup
-	tstart := time.Now()
-	for _, query := range s.Queries {
-		wg.Add(1)
-		go func(q Query) {
-			defer wg.Done()
-			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.Timeout))
-			defer cancel()
-			if err := s.executeQuery(ctx, acc, q, tstart); err != nil {
-				acc.AddError(err)
+	for i := range s.databases {
+		if !s.databases[i].Connected {
+			if err := s.ping(&s.databases[i]); err != nil {
+				return err
 			}
-		}(query)
+			s.prepareStatements(&s.databases[i])
+		}
+
+		var wg sync.WaitGroup
+		tstart := time.Now()
+		for _, query := range s.Queries {
+			wg.Add(1)
+			go func(q Query) {
+				defer wg.Done()
+				ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.Timeout))
+				defer cancel()
+				if err := s.executeQuery(ctx, acc, s.databases[i], q, tstart); err != nil {
+					acc.AddError(err)
+				}
+			}(query)
+		}
+		wg.Wait()
+		s.Log.Debugf("Executed %d queries in %s", len(s.Queries), time.Since(tstart).String())
 	}
-	wg.Wait()
-	s.Log.Debugf("Executed %d queries in %s", len(s.Queries), time.Since(tstart).String())
 
 	return nil
 }
@@ -500,7 +516,7 @@ func init() {
 	})
 }
 
-func (s *SQL) executeQuery(ctx context.Context, acc telegraf.Accumulator, q Query, tquery time.Time) error {
+func (s *SQL) executeQuery(ctx context.Context, acc telegraf.Accumulator, db database, q Query, tquery time.Time) error {
 	// Execute the query either prepared or unprepared
 	var rows *dbsql.Rows
 	if q.statement != nil {
@@ -513,7 +529,7 @@ func (s *SQL) executeQuery(ctx context.Context, acc telegraf.Accumulator, q Quer
 	} else {
 		// Fallback to unprepared query
 		var err error
-		rows, err = s.db.Query(q.Query)
+		rows, err = db.Connection.Query(q.Query)
 		if err != nil {
 			return err
 		}
@@ -529,11 +545,4 @@ func (s *SQL) executeQuery(ctx context.Context, acc telegraf.Accumulator, q Quer
 	s.Log.Debugf("Received %d rows and %d columns for query %q", rowCount, len(columnNames), q.Query)
 
 	return err
-}
-
-func (s *SQL) checkDSN() error {
-	if s.Dsn.Empty() {
-		return errors.New("missing data source name (DSN) option")
-	}
-	return nil
 }
