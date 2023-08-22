@@ -393,6 +393,7 @@ func (p *Parser) expandArray(result MetricNode, timestamp time.Time) ([]telegraf
 						// Verify that the result should be included based on the results of fieldpaths and tag paths
 						pathResult = p.existsInpathResults(result.ParentIndex)
 					}
+					fmt.Println(pathResult)
 					if pathResult == nil {
 						return results, nil
 					}
@@ -410,6 +411,7 @@ func (p *Parser) expandArray(result MetricNode, timestamp time.Time) ([]telegraf
 				if result.Tag {
 					desiredType = "string"
 				}
+				fmt.Printf("converting %s: %s (%T) called %s\n", result.SetName, result.Result, result.Result.Value(), outputName)
 				v, err := p.convertType(result.Result, desiredType, result.SetName)
 				if err != nil {
 					return nil, err
@@ -417,6 +419,7 @@ func (p *Parser) expandArray(result MetricNode, timestamp time.Time) ([]telegraf
 				if result.Tag {
 					result.Metric.AddTag(outputName, v.(string))
 				} else {
+					fmt.Printf("adding %s %s (%T)\n", outputName, v, v)
 					result.Metric.AddField(outputName, v)
 				}
 			}
@@ -429,6 +432,10 @@ func (p *Parser) expandArray(result MetricNode, timestamp time.Time) ([]telegraf
 }
 
 func (p *Parser) existsInpathResults(index int) *PathResult {
+	fmt.Printf("looking for parent: %d\n", index)
+	for _, f := range p.subPathResults {
+		fmt.Printf("%d: %s\n", f.result.Index, f.result.Raw)
+	}
 	for _, f := range p.subPathResults {
 		if f.result.Index == index {
 			return &f
@@ -474,6 +481,7 @@ func (p *Parser) processObjects(input []byte, objects []Object, timestamp time.T
 				return nil, err
 			}
 			r.DataSet = f
+			fmt.Printf("adding to results: %s\n", r.result.Raw)
 			p.subPathResults = append(p.subPathResults, r)
 		}
 
@@ -573,12 +581,15 @@ func (p *Parser) combineObject(result MetricNode, timestamp time.Time) ([]telegr
 					return false
 				}
 			} else {
+				fmt.Printf("index:        %d\n", arrayNode.Index)
+				fmt.Printf("parent index: %d\n", arrayNode.ParentIndex)
 				arrayNode.Index -= result.Index
 				arrayNode.ParentIndex -= result.Index
 				r, err := p.expandArray(arrayNode, timestamp)
 				if err != nil {
 					return false
 				}
+				fmt.Println(r)
 				results = cartesianProduct(r, results)
 			}
 

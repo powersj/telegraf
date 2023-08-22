@@ -8,6 +8,7 @@ import (
 	"context"
 	_ "embed"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"sync"
@@ -247,6 +248,7 @@ func (t *Tail) tailNewFiles(fromBeginning bool) error {
 
 // ParseLine parses a line of text.
 func parseLine(parser telegraf.Parser, line string) ([]telegraf.Metric, error) {
+	fmt.Printf("parsing line: %s\n", line)
 	m, err := parser.Parse([]byte(line))
 	if err != nil {
 		if errors.Is(err, parsers.ErrEOF) {
@@ -254,6 +256,7 @@ func parseLine(parser telegraf.Parser, line string) ([]telegraf.Metric, error) {
 		}
 		return nil, err
 	}
+	fmt.Printf("\n\n")
 	return m, err
 }
 
