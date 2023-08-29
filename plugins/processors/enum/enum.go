@@ -22,13 +22,13 @@ type EnumMapper struct {
 }
 
 type Mapping struct {
-	Tag           string
-	Tags          []string
-	Field         string
-	Fields        []string
-	Dest          string
-	Default       interface{}
-	ValueMappings map[string]interface{}
+	Tag           string                 `toml:"tag" deprecated:"1.28.0;use 'tags' instead"`
+	Tags          []string               `toml:"tags"`
+	Field         string                 `toml:"field" deprecated:"1.28.0;use 'fields' instead"`
+	Fields        []string               `toml:"fields"`
+	Dest          string                 `toml:"dest"`
+	Default       interface{}            `toml:"default"`
+	ValueMappings map[string]interface{} `toml:"value_mappings"`
 }
 
 func (*EnumMapper) SampleConfig() string {
@@ -43,14 +43,14 @@ func (mapper *EnumMapper) Init() error {
 			return fmt.Errorf("use field or fields, but not both")
 		}
 		if mapping.Field != "" {
-			fieldFilter, err := filter.NewIncludeExcludeFilter([]string{mapping.Field}, nil)
+			fieldFilter, err := filter.Compile([]string{mapping.Field})
 			if err != nil {
 				return fmt.Errorf("failed to create new field filter from field: %w", err)
 			}
 			mapper.FieldFilters[mapping.Field] = fieldFilter
 		}
 		if len(mapping.Fields) != 0 {
-			fieldFilter, err := filter.NewIncludeExcludeFilter(mapping.Fields, nil)
+			fieldFilter, err := filter.Compile(mapping.Fields)
 			if err != nil {
 				return fmt.Errorf("failed to create new field filter from fields: %w", err)
 			}
@@ -61,14 +61,14 @@ func (mapper *EnumMapper) Init() error {
 			return fmt.Errorf("use tag or tags, but not both")
 		}
 		if mapping.Tag != "" {
-			tagFilter, err := filter.NewIncludeExcludeFilter([]string{mapping.Tag}, nil)
+			tagFilter, err := filter.Compile([]string{mapping.Tag})
 			if err != nil {
 				return fmt.Errorf("failed to create new tag filter from tag: %w", err)
 			}
 			mapper.TagFilters[mapping.Tag] = tagFilter
 		}
 		if len(mapping.Tags) != 0 {
-			tagFilter, err := filter.NewIncludeExcludeFilter(mapping.Tags, nil)
+			tagFilter, err := filter.Compile(mapping.Tags)
 			if err != nil {
 				return fmt.Errorf("failed to create new tag filter from tags: %w", err)
 			}
