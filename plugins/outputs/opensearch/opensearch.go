@@ -149,18 +149,18 @@ func (o *Opensearch) newClient() error {
 	if err != nil {
 		return fmt.Errorf("getting username failed: %w", err)
 	}
-	defer config.ReleaseSecret(username)
+	defer username.Destroy()
 
 	password, err := o.Password.Get()
 	if err != nil {
 		return fmt.Errorf("getting password failed: %w", err)
 	}
-	defer config.ReleaseSecret(password)
+	defer password.Destroy()
 
 	clientConfig := opensearch.Config{
 		Addresses: o.URLs,
-		Username:  string(username),
-		Password:  string(password),
+		Username:  username.String(),
+		Password:  password.String(),
 	}
 
 	if o.configOptions.InsecureSkipVerify {
@@ -181,8 +181,8 @@ func (o *Opensearch) newClient() error {
 		if err != nil {
 			return fmt.Errorf("getting token failed: %w", err)
 		}
-		if string(token) != "" {
-			header.Add("Authorization", "Bearer "+string(token))
+		if token.String() != "" {
+			header.Add("Authorization", "Bearer "+token.String())
 		}
 	}
 	clientConfig.Header = header
