@@ -472,6 +472,8 @@ func (p *Prometheus) gatherURL(u URLAndAddress, acc telegraf.Accumulator) error 
 		case telegraf.Summary:
 			acc.AddSummary(metric.Name(), metric.Fields(), tags, metric.Time())
 		case telegraf.Histogram:
+			fmt.Println("adding histogram: ")
+			fmt.Println(metric)
 			acc.AddHistogram(metric.Name(), metric.Fields(), tags, metric.Time())
 		default:
 			acc.AddFields(metric.Name(), metric.Fields(), tags, metric.Time())

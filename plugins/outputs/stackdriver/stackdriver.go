@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"fmt"
 	"hash/fnv"
+	"math"
 	"path"
 	"sort"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/option"
+	"google.golang.org/genproto/googleapis/api/distribution"
 	metricpb "google.golang.org/genproto/googleapis/api/metric"
 	monitoredrespb "google.golang.org/genproto/googleapis/api/monitoredres"
 	"google.golang.org/grpc/status"
@@ -39,12 +41,14 @@ type Stackdriver struct {
 	TagsAsResourceLabels []string          `toml:"tags_as_resource_label"`
 	MetricCounter        []string          `toml:"metric_counter"`
 	MetricGauge          []string          `toml:"metric_gauge"`
+	MetricHistogram      []string          `toml:"metric_histogram"`
 	Log                  telegraf.Logger   `toml:"-"`
 
-	client        *monitoring.MetricClient
-	counterCache  *counterCache
-	filterCounter filter.Filter
-	filterGauge   filter.Filter
+	client          *monitoring.MetricClient
+	counterCache    *counterCache
+	filterCounter   filter.Filter
+	filterGauge     filter.Filter
+	fitlerHistogram filter.Filter
 }
 
 const (
@@ -91,6 +95,10 @@ func (s *Stackdriver) Init() error {
 	s.filterGauge, err = filter.Compile(s.MetricGauge)
 	if err != nil {
 		return fmt.Errorf("creating gauge filter failed: %w", err)
+	}
+	s.fitlerHistogram, err = filter.Compile(s.MetricHistogram)
+	if err != nil {
+		return fmt.Errorf("creating histogram filter failed: %w", err)
 	}
 
 	return nil
@@ -206,16 +214,6 @@ func (s *Stackdriver) sendBatch(batch []telegraf.Metric) error {
 	buckets := make(timeSeriesBuckets)
 	for _, m := range batch {
 		for _, f := range m.FieldList() {
-			value, err := s.getStackdriverTypedValue(f.Value)
-			if err != nil {
-				s.Log.Errorf("Get type failed: %q", err)
-				continue
-			}
-
-			if value == nil {
-				continue
-			}
-
 			// Set metric types based on user-provided filter
 			metricType := m.Type()
 			if s.filterCounter != nil && s.filterCounter.Match(m.Name()) {
@@ -224,6 +222,9 @@ func (s *Stackdriver) sendBatch(batch []telegraf.Metric) error {
 			if s.filterGauge != nil && s.filterGauge.Match(m.Name()) {
 				metricType = telegraf.Gauge
 			}
+			if s.fitlerHistogram != nil && s.fitlerHistogram.Match(m.Name()) {
+				metricType = telegraf.Histogram
+			}
 
 			metricKind, err := getStackdriverMetricKind(metricType)
 			if err != nil {
@@ -231,8 +232,44 @@ func (s *Stackdriver) sendBatch(batch []telegraf.Metric) error {
 				continue
 			}
 
-			startTime, endTime := getStackdriverIntervalEndpoints(metricKind, value, m, f, s.counterCache)
+			_ = &monitoringpb.TypedValue{Value: &monitoringpb.TypedValue_DistributionValue{
+				DistributionValue: &distribution.Distribution{
+					Count: 1,
+					Mean: sum / count,
+					SumOfSquaredDeviation: see below,
+					BucketOptions: &distribution.Distribution_BucketOptions{
+						Options: &distribution.Distribution_BucketOptions_ExplicitBuckets{
+							ExplicitBuckets: &distribution.Distribution_BucketOptions_Explicit{
+								Bounds: []float64{0.0, 5.0},
+							},
+						},
+					},
+					BucketCounts: []int64{0, 0},
+				}}}
 
+			// HOW TO CALCULATE SUM OF SQUARED DEVIATION
+			dataPoints := []float64{0, 0.5}
+
+			// Calculate the mean
+			mean = sum / count
+
+			// Calculate the SumOfSquaredDeviation
+			sumOfSquaredDeviation := 0.0
+			for _, point := range dataPoints {
+				sumOfSquaredDeviation += math.Pow(point-mean, 2)
+			}
+			// END SQUARED DEVIATION
+
+			value, err := s.getStackdriverTypedValue(f.Value)
+			if err != nil {
+				s.Log.Errorf("Get type failed: %q", err)
+				continue
+			}
+			if value == nil {
+				continue
+			}
+
+			startTime, endTime := getStackdriverIntervalEndpoints(metricKind, value, m, f, s.counterCache)
 			timeInterval, err := getStackdriverTimeInterval(metricKind, startTime, endTime)
 			if err != nil {
 				s.Log.Errorf("Get time interval failed: %s", err)
@@ -421,6 +458,11 @@ func getStackdriverTimeInterval(
 			StartTime: startTime,
 			EndTime:   endTime,
 		}, nil
+	case metricpb.MetricDescriptor_MetricKind(metricpb.MetricDescriptor_DISTRIBUTION):
+		return &monitoringpb.TimeInterval{
+			StartTime: startTime,
+			EndTime:   endTime,
+		}, nil
 	case metricpb.MetricDescriptor_DELTA, metricpb.MetricDescriptor_METRIC_KIND_UNSPECIFIED:
 		fallthrough
 	default:
@@ -436,7 +478,9 @@ func getStackdriverMetricKind(vt telegraf.ValueType) (metricpb.MetricDescriptor_
 		return metricpb.MetricDescriptor_GAUGE, nil
 	case telegraf.Counter:
 		return metricpb.MetricDescriptor_CUMULATIVE, nil
-	case telegraf.Histogram, telegraf.Summary:
+	case telegraf.Histogram:
+		return metricpb.MetricDescriptor_MetricKind(metricpb.MetricDescriptor_DISTRIBUTION), nil
+	case telegraf.Summary:
 		fallthrough
 	default:
 		return metricpb.MetricDescriptor_METRIC_KIND_UNSPECIFIED, fmt.Errorf("unsupported telegraf value type: %T", vt)
