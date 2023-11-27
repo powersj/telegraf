@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	lxd "github.com/lxc/lxd/client"
-	"github.com/lxc/lxd/shared/api"
+	lxd "github.com/lxc/incus/client"
+	"github.com/lxc/incus/shared/api"
 )
 
 var (
