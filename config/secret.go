@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -106,7 +107,9 @@ func NewSecret(b []byte) Secret {
 // UnmarshalText creates a secret from a toml value following the "string" rule.
 func (s *Secret) UnmarshalText(b []byte) error {
 	// Unmarshal secret from TOML and put it into protected memory
-	s.init(b)
+	if err := s.init(b); err != nil {
+		return err
+	}
 
 	// Keep track of secrets that contain references to secret-stores
 	// for later resolving by the config.
@@ -118,7 +121,7 @@ func (s *Secret) UnmarshalText(b []byte) error {
 }
 
 // Initialize the secret content
-func (s *Secret) init(secret []byte) {
+func (s *Secret) init(secret []byte) error {
 	// Keep track of the number of secrets...
 	secretCount.Add(1)
 
@@ -127,10 +130,17 @@ func (s *Secret) init(secret []byte) {
 
 	// Find all parts that need to be resolved and return them
 	s.unlinked = secretPattern.FindAllString(string(secret), -1)
+	// No references to secret-stores found, so we can use the
+	// selected implementation directly.
+	if len(s.unlinked) == 0 {
+		return errors.New("invalid secret-store pattern, must only contain letters, numbers or underscore")
+	}
 	s.resolvers = nil
 
 	// Setup the container implementation
 	s.container = selectedImpl.Container(secret)
+
+	return nil
 }
 
 // Destroy the secret content
