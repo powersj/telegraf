@@ -4,6 +4,7 @@ package date
 import (
 	_ "embed"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/influxdata/telegraf"
@@ -48,19 +49,27 @@ func (d *Date) Apply(in ...telegraf.Metric) []telegraf.Metric {
 	for _, point := range in {
 		tm := point.Time().In(d.location).Add(time.Duration(d.DateOffset))
 		if len(d.TagKey) > 0 {
-			point.AddTag(d.TagKey, tm.Format(d.DateFormat))
+			if str, ok := point.Tags()[d.TagKey]; ok {
+				fmt.Printf("translating this tag: %s\n", str)
+			} else {
+				point.AddTag(d.TagKey, tm.Format(d.DateFormat))
+			}
 		} else if len(d.FieldKey) > 0 {
-			switch d.DateFormat {
-			case "unix":
-				point.AddField(d.FieldKey, tm.Unix())
-			case "unix_ms":
-				point.AddField(d.FieldKey, tm.UnixNano()/1000000)
-			case "unix_us":
-				point.AddField(d.FieldKey, tm.UnixNano()/1000)
-			case "unix_ns":
-				point.AddField(d.FieldKey, tm.UnixNano())
-			default:
-				point.AddField(d.FieldKey, tm.Format(d.DateFormat))
+			if str, ok := point.Fields()[d.TagKey]; ok {
+				fmt.Printf("translating this field: %s\n", str)
+			} else {
+				switch d.DateFormat {
+				case "unix":
+					point.AddField(d.FieldKey, tm.Unix())
+				case "unix_ms":
+					point.AddField(d.FieldKey, tm.UnixNano()/1000000)
+				case "unix_us":
+					point.AddField(d.FieldKey, tm.UnixNano()/1000)
+				case "unix_ns":
+					point.AddField(d.FieldKey, tm.UnixNano())
+				default:
+					point.AddField(d.FieldKey, tm.Format(d.DateFormat))
+				}
 			}
 		}
 	}
